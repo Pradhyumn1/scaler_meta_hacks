@@ -1,3 +1,13 @@
+---
+title: Customer Support OpenEnv
+emoji: 🏢
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # Customer Support OpenEnv
 
 This is a real-world task simulation environment built for the OpenEnv framework.
