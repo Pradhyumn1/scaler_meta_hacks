@@ -65,7 +65,7 @@ class CustomerSupportEnv:
         cmd = action.command
         arg = action.argument
         
-        reward = 0.0
+        reward = 0.05
         done = False
         obs = Observation(system_message=f"Executed {cmd} with {arg}")
         obs.echoed_message = f"Executed {cmd}"
@@ -88,9 +88,9 @@ class CustomerSupportEnv:
         elif cmd == "reply_to_customer":
             if task["type"] == "KB_QUERY":
                 if "30" in arg.lower() and "days" in arg.lower():
-                    reward = 1.0
+                    reward = 0.99
                 else:
-                    reward = 0.0
+                    reward = 0.01
                 done = True
             elif task["type"] == "REPLACEMENT_OUT_OF_STOCK":
                 if "refund" in arg.lower() or "stock" in arg.lower():
@@ -103,18 +103,18 @@ class CustomerSupportEnv:
                 amt = float(arg)
                 if "expected_amount" in task:
                     if abs(amt - task["expected_amount"]) < 0.1:
-                        reward = 1.0
+                        reward = 0.99
                         done = True
                     else:
-                        reward = 0.0
+                        reward = 0.01
                         done = True
                 else:
-                    reward = -0.5
+                    reward = 0.01
             except ValueError:
-                reward = -0.5
+                reward = 0.01
         elif cmd == "issue_replacement":
             if task["type"] == "REPLACEMENT_OUT_OF_STOCK":
-                reward = -0.5
+                reward = 0.01
                 obs.command_result = "Failed: Item is out of stock! Find an alternative resolution."
             else:
                 obs.command_result = "Replacement issued."
