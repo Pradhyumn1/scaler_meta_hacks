@@ -1,0 +1,18 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "customer-support-env"
+version = "1.0.0"
+description = "A Customer Support OpenEnv Environment"
+
+dependencies = [
+    "openenv-core",
+    "fastapi",
+    "uvicorn",
+    "pydantic"
+]
+
+[project.scripts]
+server = "server.app:main"

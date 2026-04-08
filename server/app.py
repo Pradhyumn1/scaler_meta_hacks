@@ -35,3 +35,10 @@ def step_env(request: StepRequest):
 def state_env():
     state = env.get_state()
     return StateResponse(state=state)
+
+def main():
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=7860)
+
+if __name__ == "__main__":
+    main()
