@@ -1,0 +1,6 @@
+name: "customer-support-env"
+version: "1.0.0"
+description: "A multi-task customer support environment simulating ticket triage, refunds, and replacements."
+action: Action
+observation: Observation
+spec_version: 1
