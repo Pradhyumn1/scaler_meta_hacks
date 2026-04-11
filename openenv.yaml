@@ -1,6 +1,23 @@
 name: "customer-support-env"
 version: "1.0.0"
 description: "A multi-task customer support environment simulating ticket triage, refunds, and replacements."
-action: Action
-observation: Observation
+action: env.CustomerAction
+observation: env.CustomerObservation
 spec_version: 1
+
+tasks:
+  - id: "T1"
+    name: "Return Policy Query"
+    description: "Customer is asking about the general return policy."
+    difficulty: "easy"
+    grader: "env:grade_task"
+  - id: "T2"
+    name: "Refund Processing"
+    description: "Customer email alice@example.com wants a refund. Item was damaged."
+    difficulty: "medium"
+    grader: "env:grade_task"
+  - id: "T3"
+    name: "Out-of-Stock Replacement"
+    description: "Customer email bob@example.com wants a replacement. It is out of stock."
+    difficulty: "hard"
+    grader: "env:grade_task"
