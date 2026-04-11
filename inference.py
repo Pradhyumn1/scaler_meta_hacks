@@ -38,6 +38,10 @@ def log_start(task: str, env: str, model: str):
     print(f"[START] task={task} env={env} model={model}", flush=True)
 
 
+def log_step(step: int, command: str, argument: str):
+    print(f"[STEP] step={step} command={command} argument={argument!r}", flush=True)
+
+
 def log_end(success: bool, steps: int, score: float, rewards: List[float]):
     rewards_str = ",".join(f"{r:.2f}" for r in rewards)
     print(f"[END] success={str(success).lower()} steps={steps} score={score:.3f} rewards={rewards_str}", flush=True)
@@ -81,9 +85,11 @@ def main() -> None:
     env = CustomerSupportEnvironment()
 
     history: List[str] = []
-    rewards: List[float] = []
+
+    # task_rewards: one entry per completed task (strictly between 0 and 1)
+    task_rewards: List[float] = []
+
     steps_taken = 0
-    score = 0.0
     success = False
 
     log_start(task=TASK_NAME, env=BENCHMARK, model=MODEL_NAME)
@@ -92,6 +98,7 @@ def main() -> None:
         obs = env.reset()
         last_echoed = obs.echoed_message or obs.system_message
         last_reward = 0.0
+        prev_task_idx = env.state.current_task_idx
 
         for step in range(1, MAX_STEPS + 1):
             state = env.state
@@ -140,7 +147,7 @@ def main() -> None:
                 argument=str(action_dict.get("argument", "")),
             )
 
-            print(f"[STEP] step={step} command={action.command} argument={action.argument!r}", flush=True)
+            log_step(step, action.command, action.argument)
 
             obs = env.step(action)
             reward = obs.reward if obs.reward is not None else 0.0
@@ -148,17 +155,25 @@ def main() -> None:
             last_echoed = obs.echoed_message or obs.system_message
             last_reward = reward
 
-            score += reward
-            rewards.append(reward)
+            # Only record reward when a TASK COMPLETES (task_idx advances)
+            new_task_idx = env.state.current_task_idx
+            if new_task_idx > prev_task_idx or (done and new_task_idx >= len(TASKS)):
+                # Clamp to strict (0, 1) range
+                clamped = max(0.01, min(0.99, reward))
+                task_rewards.append(clamped)
+                prev_task_idx = new_task_idx
 
-            if done and state.current_task_idx + 1 >= len(TASKS):
+            if done and env.state.current_task_idx >= len(TASKS):
                 success = True
                 break
 
     except Exception as e:
         print(f"[ERROR] {e}", flush=True)
 
-    log_end(success=success, steps=steps_taken, score=score, rewards=rewards)
+    # score = average per-task reward, strictly between 0 and 1
+    score = sum(task_rewards) / len(task_rewards) if task_rewards else 0.01
+
+    log_end(success=success, steps=steps_taken, score=score, rewards=task_rewards)
 
 
 if __name__ == "__main__":
