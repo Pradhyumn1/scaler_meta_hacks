@@ -42,9 +42,14 @@ def log_step(step: int, command: str, argument: str):
     print(f"[STEP] step={step} command={command} argument={argument!r}", flush=True)
 
 
+def log_task(task_id: str, score: float):
+    """Log completion of a single graded task."""
+    print(f"[TASK] task_id={task_id} score={score:.3f}", flush=True)
+
+
 def log_end(success: bool, steps: int, score: float, rewards: List[float]):
-    rewards_str = ",".join(f"{r:.2f}" for r in rewards)
-    print(f"[END] success={str(success).lower()} steps={steps} score={score:.3f} rewards={rewards_str}", flush=True)
+    rewards_str = ",".join(f"{r:.3f}" for r in rewards)
+    print(f"[END] success={str(success).lower()} steps={steps} score={score:.3f} tasks={len(rewards)} rewards={rewards_str}", flush=True)
 
 
 def build_user_prompt(step: int, last_echoed: str, last_reward: float, history: List[str]) -> str:
@@ -160,6 +165,8 @@ def main() -> None:
             if new_task_idx > prev_task_idx or (done and new_task_idx >= len(TASKS)):
                 # Clamp to strict (0, 1) range
                 clamped = max(0.01, min(0.99, reward))
+                task_id = TASKS[prev_task_idx]["id"] if prev_task_idx < len(TASKS) else f"T{prev_task_idx+1}"
+                log_task(task_id, clamped)
                 task_rewards.append(clamped)
                 prev_task_idx = new_task_idx
 
