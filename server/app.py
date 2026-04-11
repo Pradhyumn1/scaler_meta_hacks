@@ -1,44 +1,28 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
-from typing import Any, Dict
-from env import CustomerSupportEnv, Action, Observation, State
+"""
+customer-support-env server/app.py
+Uses the official OpenEnv create_fastapi_app so that all standard endpoints
+(/health, /metadata, /schema, /mcp, /reset, /step, /state) are registered.
+"""
+import sys
+import os
 
-app = FastAPI(title="OpenEnv - Customer Support")
-env = CustomerSupportEnv()
+# Ensure the repo root is on sys.path so 'env' can be imported
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-class ResetResponse(BaseModel):
-    observation: Observation
+from openenv.core.env_server import create_fastapi_app
+from env import CustomerSupportEnvironment, CustomerAction, CustomerObservation
 
-class StepRequest(BaseModel):
-    action: Action
+app = create_fastapi_app(
+    env=CustomerSupportEnvironment,       # factory callable
+    action_cls=CustomerAction,
+    observation_cls=CustomerObservation,
+)
 
-class StepResponse(BaseModel):
-    observation: Observation
-    reward: float
-    done: bool
-    info: Dict[str, Any]
-
-class StateResponse(BaseModel):
-    state: State
-
-@app.post("/reset", response_model=ResetResponse)
-def reset_env():
-    obs = env.reset()
-    return ResetResponse(observation=obs)
-
-@app.post("/step", response_model=StepResponse)
-def step_env(request: StepRequest):
-    obs, reward, done, info = env.step(request.action)
-    return StepResponse(observation=obs, reward=reward, done=done, info=info)
-
-@app.get("/state", response_model=StateResponse)
-def state_env():
-    state = env.get_state()
-    return StateResponse(state=state)
 
 def main():
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=7860)
+
 
 if __name__ == "__main__":
     main()
