@@ -4,6 +4,10 @@ description: "A multi-task customer support environment simulating ticket triage
 action: server.env.CustomerAction
 observation: server.env.CustomerObservation
 spec_version: 1
+type: space
+runtime: fastapi
+app: server.app:app
+port: 7860
 
 tasks:
   - id: "T1"
