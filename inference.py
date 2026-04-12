@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()  # Load variables from .env automatically
 
-from env import CustomerSupportEnvironment, CustomerAction, TASKS
+from server.env import CustomerSupportEnvironment, CustomerAction, TASKS
 
 API_BASE_URL = os.getenv("API_BASE_URL", "https://api.openai.com/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "gpt-3.5-turbo")

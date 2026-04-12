@@ -10,7 +10,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from openenv.core.env_server import create_fastapi_app
-from env import CustomerSupportEnvironment, CustomerAction, CustomerObservation
+from .env import CustomerSupportEnvironment, CustomerAction, CustomerObservation
 
 app = create_fastapi_app(
     env=CustomerSupportEnvironment,       # factory callable

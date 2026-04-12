@@ -16,3 +16,9 @@ dependencies = [
 
 [project.scripts]
 server = "server.app:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["server"]
+
+[tool.hatch.build.targets.sdist]
+packages = ["server"]
